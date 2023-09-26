@@ -192,3 +192,43 @@ extension OrderedSet: MutableCollection {
 		return i + 1
 	}
 }
+
+public struct OrderedDictionary<Key: Hashable, Value> {
+    public private(set) var keys: [Key] = []
+    public private(set) var values: [Key: Value] = [:]
+
+    public mutating func insert(key: Key, value: Value) {
+        if !keys.contains(key) {
+            keys.append(key)
+        }
+        values[key] = value
+    }
+
+    public func value(forKey key: Key) -> Value? {
+        return values[key]
+    }
+
+    public func index(forKey key: Key) -> Int? {
+        return keys.firstIndex(of: key)
+    }
+
+    public subscript(key: Key) -> Value? {
+        get {
+            return values[key]
+        }
+        set(newValue) {
+            if newValue != nil {
+                insert(key: key, value: newValue!)
+            } else {
+                removeValue(forKey: key)
+            }
+        }
+    }
+
+    public mutating func removeValue(forKey key: Key) {
+        if let index = keys.firstIndex(of: key) {
+            keys.remove(at: index)
+            values[key] = nil
+        }
+    }
+}

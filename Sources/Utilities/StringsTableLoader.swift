@@ -55,7 +55,7 @@ public struct StringsTableLoader {
                 if filePath.string.pathExtension == "strings" {
                     entries[locale] = try load(from: filePath, options: options)
                 } else if filePath.string.pathExtension == "stringsdict" {
-                    dictEntries[locale] = try load(from: filePath)
+                    _ = try load(from: filePath)
                 }
             }
         }
@@ -78,22 +78,22 @@ public struct StringsTableLoader {
         }
     }
     
-    private func load(from path: Path) throws -> [String: StringsTable.Dict] {
-        
-        
-        
-        print("path:\(path.string)")
+    private func load(from path: Path) throws -> OrderedDictionary<String, Any?> {
         let data = try path.read()
-        let decoder = YAMLDecoder()
-        let dict = decoder.decode([String: Any].self, from: data)
+        var sortedDict: OrderedDictionary<String, Any?>  = OrderedDictionary()
+        if let dict = try PropertyListSerialization.propertyList(
+            from: data,
+            options: [],
+            format: nil
+        ) as? [String : Any] {
+            dict.keys.sorted().forEach { key in
+                sortedDict.insert(key: key, value: dict[key])
+            }
+        }
         
-        print("dict:\(dict)")
-        return [:]
+        print("sortedDict:\(sortedDict.keys)")
+        return sortedDict
     }
-}
-
-struct Test: Codable {
-    let
 }
 
 
